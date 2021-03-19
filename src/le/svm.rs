@@ -1,3 +1,6 @@
+use crate::le::tensor::Tensor;
+use crate::le::model::Model;
+    
 struct SVM {
 
 }
@@ -9,7 +12,7 @@ struct SVMTrainingOptions {
 
 impl SVM {
     pub fn new() -> SVM {
-
+        SVM {}
     }
     pub fn train(&mut self, x: &Tensor, y: &Tensor, options: SVMTrainingOptions) {
 
@@ -17,8 +20,8 @@ impl SVM {
 }
 
 impl Model for SVM {
-    pub fn predict(&mut self, x: &Tensor) -> Tensor {
-
+    fn predict(&mut self, x: &Tensor) -> Tensor {
+        Tensor::new()
     }
 }
 
