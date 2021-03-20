@@ -4,6 +4,7 @@ use crate::le::shape::Shape;
 #[link(name = "le")]
 extern "C" {
     fn le_tensor_new_from_data(element_type: usize, shape: *const c_void, data: *const c_void) -> *mut c_void;
+    fn le_tensor_free(tensor: *mut c_void);
 }
 
 pub struct Tensor {
@@ -11,10 +12,7 @@ pub struct Tensor {
 }
 
 impl Tensor {
-    pub fn new() -> Tensor {
-        Tensor { tensor: std::ptr::null_mut() }
-    }
-    pub fn new_2d(data: &[&[f32]]) -> Tensor {
+    pub fn new_2d(_data: &[&[f32]]) -> Tensor {
         let shape = Shape::new(2, &[1, 1]);
         let tensor = unsafe { le_tensor_new_from_data(1, shape.shape, std::ptr::null()) };
         Tensor { tensor }
@@ -23,6 +21,8 @@ impl Tensor {
 
 impl Drop for Tensor {
     fn drop(&mut self) {
-
+        unsafe {
+            le_tensor_free(self.tensor);
+        }
     }
 }
