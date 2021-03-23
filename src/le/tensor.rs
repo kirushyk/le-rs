@@ -1,4 +1,5 @@
 use std::os::raw::c_void;
+use std::ops::AddAssign;
 use crate::le::shape::Shape;
 
 #[repr(C)]
@@ -20,6 +21,7 @@ extern "C" {
     fn le_tensor_new_uninitialized(element_type: Type, c_shape: *const c_void) -> *mut c_void;
     fn le_tensor_get_data(c_tensor: *mut c_void) -> *mut c_void;
     fn le_tensor_free(c_tensor: *mut c_void);
+    fn le_tensor_add_tensor(c_tensor: *mut c_void, rhs: *const c_void);
 }
 
 pub struct Tensor {
@@ -48,10 +50,29 @@ impl Tensor {
     }
 }
 
+impl AddAssign for Tensor {
+    fn add_assign(&mut self, rhs: Tensor) {
+        unsafe {
+            le_tensor_add_tensor(self.c_tensor, rhs.c_tensor);
+        }
+    }
+}
+
 impl Drop for Tensor {
     fn drop(&mut self) {
         unsafe {
             le_tensor_free(self.c_tensor);
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn sum() {
+        let mut a = Tensor::new_2d(&[&[5.0, 6.0, 7.0, 8.0]]);
+        let b = Tensor::new_2d(&[&[1.0, 2.0, 3.0, 4.0]]);
+        a += b;
     }
 }
