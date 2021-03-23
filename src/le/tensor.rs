@@ -22,6 +22,7 @@ extern "C" {
     fn le_tensor_get_data(c_tensor: *mut c_void) -> *mut c_void;
     fn le_tensor_free(c_tensor: *mut c_void);
     fn le_tensor_add_tensor(c_tensor: *mut c_void, rhs: *const c_void);
+    fn le_tensor_add_f32(c_tensor: *mut c_void, rhs: f32);
 }
 
 pub struct Tensor {
@@ -58,6 +59,14 @@ impl AddAssign for Tensor {
     }
 }
 
+impl AddAssign<f32> for Tensor {
+    fn add_assign(&mut self, rhs: f32) {
+        unsafe {
+            le_tensor_add_f32(self.c_tensor, rhs);
+        }
+    }
+}
+
 impl Drop for Tensor {
     fn drop(&mut self) {
         unsafe {
@@ -74,5 +83,6 @@ mod tests {
         let mut a = Tensor::new_2d(&[&[5.0, 6.0, 7.0, 8.0]]);
         let b = Tensor::new_2d(&[&[1.0, 2.0, 3.0, 4.0]]);
         a += b;
+        a += 3.0;
     }
 }
